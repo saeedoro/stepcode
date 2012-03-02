@@ -13,6 +13,7 @@
 
 #include "complexSupport.h"
 #include <scl_memmgr.h>
+#include <scl_cstring.h>
 
 EntNode::EntNode( char * namelist[] )
 /*
@@ -75,7 +76,7 @@ EntNode::EntNode( char * namelist[] )
 
     // Finally, place the contents of firstnode in 'this', and delete first-
     // node.  This ensures that 'this' is first.
-    strcpy( name, firstnode->name );
+    scl_strcpy_s( name, BUFSIZ, firstnode->name );
     next = firstnode->next;
     multSupers = firstnode->multSupers;
     firstnode->next = NULL;

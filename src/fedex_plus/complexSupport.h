@@ -13,6 +13,7 @@ extern "C"
 #include "../exppp/exppp.h"
 #include "../express/dict.h"
 }
+#include <scl_cstring.h>
 
 #define FALSE      0
 #define TRUE       1
@@ -72,7 +73,7 @@ class EntNode {
 
     public:
         EntNode( char * nm = "" ) : next( 0 ), mark( NOMARK ), multSupers( 0 ) {
-            strcpy( name, nm );
+            scl_strcpy_s( name, BUFSIZ, nm );
         }
         EntNode( char *[] );  // given a list, create a linked list of EntNodes
         ~EntNode() {
@@ -196,7 +197,7 @@ class SimpleList : public EntList {
 
     public:
         SimpleList( const char * n ) : EntList( SIMPLE ), I_marked( NOMARK ) {
-            strcpy( name, n );
+            scl_strcpy_s( name, BUFSIZ, n );
         }
         ~SimpleList() {}
         int operator== ( const char * nm ) {

@@ -4,6 +4,7 @@
 
 #include "complexSupport.h"
 #include <scl_memmgr.h>
+#include <scl_cstring.h>
 
 /*******************************************************************
 ** FedEx parser output module for generating C++  class definitions
@@ -327,7 +328,7 @@ void SCOPEPrint( Scope scope, FILES * files, Schema schema, Express model,
     fprintf( files -> lib, "\n/*        **************  SCOPE          */\n" );
 
     LISTdo( list, s, Schema )
-    sprintf( nm, "%s::schema", SCHEMAget_name( s ) );
+    sprintf( nm,  "%s::schema", SCHEMAget_name( s ) );
     fprintf( files->inc, "//	         include definitions for %s \n", nm );
     fprintf( files->inc, "#include <%s.h> \n", nm );
     LISTod;
@@ -364,14 +365,14 @@ void SCHEMAprint( Schema schema, FILES * files, Express model, void * complexCol
     /**********  create files based on name of schema   ***********/
     /*  return if failure           */
     /*  1.  header file             */
-    sprintf( schnm, "%s%s", SCHEMA_FILE_PREFIX,
+    scl_sprintf_s( schnm, MAX_LEN, "%s%s", SCHEMA_FILE_PREFIX,
              StrToUpper( SCHEMAget_name( schema ) ) ); //TODO change file names to CamelCase?
     if( suffix == 0 ) {
-        sprintf( sufnm, "%s", schnm );
+        scl_sprintf_s( sufnm, MAX_LEN, "%s", schnm );
     } else {
-        sprintf( sufnm, "%s_%d", schnm, suffix );
+        scl_sprintf_s( sufnm, MAX_LEN, "%s_%d", schnm, suffix );
     }
-    sprintf( fnm, "%s.h", sufnm );
+    scl_sprintf_s( fnm, MAX_LEN, "%s.h", sufnm );
 
     if( !( incfile = ( files -> inc ) = FILEcreate( fnm ) ) ) {
         return;
@@ -383,7 +384,7 @@ void SCHEMAprint( Schema schema, FILES * files, Express model, void * complexCol
     np = fnm + strlen( fnm ) - 1; /*  point to end of constant part of string  */
 
     /*  2.  class source file            */
-    sprintf( np, "cc" );
+    scl_sprintf_s( np, MAX_LEN - strlen( fnm ) - 1, "cc" );
     if( !( libfile = ( files -> lib ) = FILEcreate( fnm ) ) ) {
         return;
     }
@@ -392,7 +393,7 @@ void SCHEMAprint( Schema schema, FILES * files, Express model, void * complexCol
 //TODO: Looks like this switches between 'schema.h' and a non-generic name. What is that name,
 //and how do we fully enable this feature (i.e. how to write the file with different name)?
 #ifdef SCHEMA_HANDLING
-    sprintf( np, "h" );
+    scl_sprintf_s( np, MAX_LEN - strlen( fnm ) - 1, "h" );
     fprintf( libfile, "#include <%s.h> \n", sufnm );
 #else
     fprintf( libfile, "#include \"schema.h\"\n" );
@@ -409,7 +410,7 @@ void SCHEMAprint( Schema schema, FILES * files, Express model, void * complexCol
     fprintf( libfile, "\n#include \"%s.h\"\n", schnm );
 
     // 3. header for namespace to contain all formerly-global variables
-    sprintf( fnm, "%sNames.h", schnm );
+    scl_sprintf_s( fnm, MAX_LEN, "%sNames.h", schnm );
     if( !( files->names = FILEcreate( fnm ) ) ) {
         return;
     }
@@ -424,7 +425,7 @@ void SCHEMAprint( Schema schema, FILES * files, Express model, void * complexCol
 
     if( suffix <= 1 ) {
         /* I.e., if this is our first pass with schema */
-        sprintf( fnm, "%s.init.cc", schnm );
+        scl_sprintf_s( fnm, MAX_LEN, "%s.init.cc", schnm );
         /* Note - We use schnm (without the "_x" suffix sufnm has) since we
         ** only generate a single init.cc file. */
         if( !( initfile = ( files -> init ) = FILEcreate( fnm ) ) ) {
@@ -489,7 +490,7 @@ void SCHEMAprint( Schema schema, FILES * files, Express model, void * complexCol
         fprintf( files->classes, "\n#include \"%sNames.h\"\n", schnm );
     } else {
         /* Just reopen the .init.cc (in append mode): */
-        sprintf( fnm, "%s.init.cc", schnm );
+        scl_sprintf_s( fnm, MAX_LEN, "%s.init.cc", schnm );
         initfile = files->init = fopen( fnm, "a" );
     }
 
@@ -597,7 +598,7 @@ EXPRESSPrint( Express express, ComplexCollect & col, FILES * files ) {
     /**********  create files based on name of schema   ***********/
     /*  return if failure           */
     /*  1.  header file             */
-    sprintf( fnm, "%s.h", schnm = ClassName( EXPRESSget_basename( express ) ) );
+    scl_sprintf_s( fnm, MAX_LEN, "%s.h", schnm = ClassName( EXPRESSget_basename( express ) ) );
     if( !( incfile = ( files -> inc ) = FILEcreate( fnm ) ) ) {
         return;
     }
@@ -608,7 +609,7 @@ EXPRESSPrint( Express express, ComplexCollect & col, FILES * files ) {
     np = fnm + strlen( fnm ) - 1; /*  point to end of constant part of string  */
 
     /*  2.  class source file            */
-    sprintf( np, "cc" );
+    scl_sprintf_s( np, MAX_LEN - (np - fnm), "cc" );
     if( !( libfile = ( files -> lib ) = FILEcreate( fnm ) ) ) {
         return;
     }
@@ -617,7 +618,7 @@ EXPRESSPrint( Express express, ComplexCollect & col, FILES * files ) {
     fprintf( libfile, "#include \"%s.h\" n", schnm );
 
     // 3. header for namespace to contain all formerly-global variables
-    sprintf( fnm, "%sNames.h", schnm );
+    scl_sprintf_s( fnm, MAX_LEN, "%sNames.h", schnm );
     if( !( files->names = FILEcreate( fnm ) ) ) {
         return;
     }
@@ -629,7 +630,7 @@ EXPRESSPrint( Express express, ComplexCollect & col, FILES * files ) {
     /*  4.  source code to initialize entity registry   */
     /*  prints header of file for input function    */
 
-    sprintf( np, "init.cc" );
+    scl_sprintf_s( np, MAX_LEN - (np - fnm), "init.cc" );
     if( !( initfile = ( files -> init ) = FILEcreate( fnm ) ) ) {
         return;
     }

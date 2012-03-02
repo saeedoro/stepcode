@@ -77,6 +77,7 @@
 #include <stdio.h>
 #include "../express/express.h"
 #include "../express/resolve.h"
+#include <scl_cstring.h>
 
 extern void print_fedex_version( void );
 
@@ -129,7 +130,7 @@ void EXPRESSinit_init() {
     EXPRESSsucceed = success;
     EXPRESSgetopt = Handle_FedPlus_Args;
     /* so the function getopt (see man 3 getopt) will not report an error */
-    strcat( EXPRESSgetopt_options, "sSLcCaA" );
+    scl_strcat_s( EXPRESSgetopt_options, 256, "sSLcCaA" );
     ERRORusage_function = fedex_plus_usage;
 }
 

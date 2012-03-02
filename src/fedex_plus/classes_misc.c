@@ -2,6 +2,8 @@
 #include <scl_memmgr.h>
 #include <stdlib.h>
 #include "classes.h"
+
+#include <scl_cstring.h>
 /*******************************************************************
 ** FedEx parser output module for generating C++  class definitions
 ** December  5, 1989
@@ -231,8 +233,8 @@ TYPEget_ctype( const Type t ) {
             /*
                     strcpy (retval, ClassName (TYPEget_name (bt)));
             */
-            strcpy( retval, TYPEget_ctype( bt ) );
-            strcat( retval, "_agg" );
+            scl_strcpy_s( retval, BUFSIZ, TYPEget_ctype( bt ) );
+            scl_strcat_s( retval, BUFSIZ, "_agg" );
             return ( retval );
         }
 
@@ -294,16 +296,16 @@ TYPEget_ctype( const Type t ) {
 
     /*      case TYPE_ENTITY:   */
     if( class == entity_ ) {
-        strncpy( retval, TypeName( t ), BUFSIZ - 2 );
-        strcat( retval, "_ptr" );
+        scl_strncpy_s( retval, BUFSIZ, TypeName( t ), BUFSIZ - 2 );
+        scl_strcat_s( retval, BUFSIZ, "_ptr" );
         return retval;
         /*  return ("STEPentityH");    */
     }
     /*    case TYPE_ENUM:   */
     /*    case TYPE_SELECT: */
     if( class == enumeration_ ) {
-        strncpy( retval, TypeName( t ), BUFSIZ - 2 );
-        strcat( retval, "_var" );
+        scl_strncpy_s( retval, BUFSIZ, TypeName( t ), BUFSIZ - 2 );
+        scl_strcat_s( retval, BUFSIZ, "_var" );
         return retval;
     }
     if( class == select_ )  {
@@ -323,9 +325,9 @@ TYPEget_ctype( const Type t ) {
 const char *
 TypeName( Type t ) {
     static char name [BUFSIZ];
-    strcpy( name, TYPE_PREFIX );
+    scl_strcpy_s( name, BUFSIZ, TYPE_PREFIX );
     if( TYPEget_name( t ) ) {
-        strncat( name, FirstToUpper( TYPEget_name( t ) ), BUFSIZ - strlen( TYPE_PREFIX ) - 1 );
+        scl_strncat_s( name, BUFSIZ, FirstToUpper( TYPEget_name( t ) ), BUFSIZ - strlen( TYPE_PREFIX ) - 1 );
     } else {
         return TYPEget_ctype( t );
     }
@@ -346,33 +348,33 @@ const char *
 AccessType( Type t ) {
     Class_Of_Type class;
     static char nm [BUFSIZ];
-    strncpy( nm, TypeName( t ), BUFSIZ - 4 );
+    scl_strncpy_s( nm, BUFSIZ, TypeName( t ), BUFSIZ - 4 );
     if( TYPEis_entity( t ) ) {
         /*  if(corba_binding)
             {
                 if (TYPEget_name (t))
-                  strncpy (nm, FirstToUpper (TYPEget_name (t)), BUFSIZ-1);
+                  scl_strncpy_s (nm, BUFSIZ, FirstToUpper (TYPEget_name (t)), BUFSIZ-1);
             }
         */
-        strcat( nm, "_ptr" );
+        scl_strcat_s( nm, BUFSIZ, "_ptr" );
         return nm;
     } else if( TYPEis_select( t ) || TYPEis_aggregate( t ) ) {
-        strcat( nm, "_ptr" );
+        scl_strcat_s( nm, BUFSIZ, "_ptr" );
         return nm;
     }
     class = TYPEget_type( t );
     if( class == enumeration_ ) {
-        strncpy( nm, TypeName( t ), BUFSIZ - 2 );
-        strcat( nm, "_var" );
+        scl_strncpy_s( nm, BUFSIZ, TypeName( t ), BUFSIZ - 2 );
+        scl_strcat_s( nm, BUFSIZ, "_var" );
         return nm;
     }
     if( class == logical_ ) {
-        strncpy( nm, "Logical", BUFSIZ - 2 );
+        scl_strncpy_s( nm, BUFSIZ, "Logical", BUFSIZ - 2 );
     }
 
     /*    case TYPE_BOOLEAN:    */
     if( class == boolean_ ) {
-        strncpy( nm, "Boolean", BUFSIZ - 2 );
+        scl_strncpy_s( nm, BUFSIZ, "Boolean", BUFSIZ - 2 );
     }
     return nm;
 }
@@ -394,7 +396,7 @@ ClassName( const char * oldname ) {
     }
 
 
-    strcpy( newname, ENTITYCLASS_PREFIX )    ;
+    scl_strcpy_s( newname, BUFSIZ, ENTITYCLASS_PREFIX )    ;
     j = strlen( ENTITYCLASS_PREFIX )    ;
     newname [j] = ToUpper( oldname [i] );
     ++i;
@@ -464,10 +466,10 @@ EnumName( const char * oldname ) {
         return ( "" );
     }
 
-    strcpy( newname, ENUM_PREFIX )    ;
+    scl_strcpy_s( newname, MAX_LEN, ENUM_PREFIX )    ;
     j = strlen( ENUM_PREFIX )    ;
     newname [j] = ToUpper( oldname [0] );
-    strncpy( newname + j + 1, StrToLower( oldname + 1 ), MAX_LEN - j - 1 );
+    scl_strncpy_s( newname + j + 1, MAX_LEN - j - 1, StrToLower( oldname + 1 ), MAX_LEN - j - 1 );
     j = strlen( newname );
     newname [j] = '\0';
     return ( newname );
@@ -481,11 +483,11 @@ SelectName( const char * oldname ) {
         return ( "" );
     }
 
-    strcpy( newname, TYPE_PREFIX );
+    scl_strcpy_s( newname, MAX_LEN, TYPE_PREFIX );
     newname [0] = ToUpper( newname [0] );
     j = strlen( TYPE_PREFIX );
     newname [j] = ToUpper( oldname [0] );
-    strncpy( newname + j + 1, StrToLower( oldname + 1 ), MAX_LEN - j - 1 );
+    scl_strncpy_s( newname + j + 1, MAX_LEN - j - 1, StrToLower( oldname + 1 ), MAX_LEN - j - 1 );
     j = strlen( newname );
     newname [j] = '\0';
     return ( newname );
@@ -495,7 +497,7 @@ const char *
 FirstToUpper( const char * word ) {
     static char newword [MAX_LEN];
 
-    strncpy( newword, word, MAX_LEN );
+    scl_strncpy_s( newword, MAX_LEN, word, MAX_LEN );
     newword[0] = ToUpper( newword[0] );
     return ( newword );
 }
@@ -565,7 +567,7 @@ const char * TypeDescriptorName( Type t ) {
         ** by following through the entity they reference, as above. */
     }
 
-    sprintf( b, "%s::%s%s", SCHEMAget_name( parent ), TYPEprefix( t ),
+    scl_sprintf_s( b, BUFSIZ, "%s::%s%s", SCHEMAget_name( parent ), TYPEprefix( t ),
              TYPEget_name( t ) );
     return b;
 }

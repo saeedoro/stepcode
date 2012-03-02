@@ -34,6 +34,7 @@
 #include <scl_memmgr.h>
 #include <stdlib.h>
 #include "classes.h"
+#include <scl_cstring.h>
 
 #define FALSE 0
 #define TRUE  1
@@ -609,12 +610,12 @@ static void addRenameTypedefs( Schema schema, FILE * classes )
             firsttime = FALSE;
         }
         if( TYPEis_enumeration( t ) ) {
-            strncpy( nm, TYPEget_ctype( t ), BUFSIZ - 1 );
-            strncpy( basenm, TYPEget_ctype( i ), BUFSIZ - 1 );
+            scl_strncpy_s( nm, BUFSIZ, TYPEget_ctype( t ), BUFSIZ - 1 );
+            scl_strncpy_s( basenm, BUFSIZ, TYPEget_ctype( i ), BUFSIZ - 1 );
             fprintf( classes, "typedef %s_agg        %s_agg;\n", basenm, nm );
         } else {
-            strncpy( nm, SelectName( TYPEget_name( t ) ), BUFSIZ - 1 );
-            strncpy( basenm, SelectName( TYPEget_name( i ) ), BUFSIZ - 1 );
+            scl_strncpy_s( nm, BUFSIZ, SelectName( TYPEget_name( t ) ), BUFSIZ - 1 );
+            scl_strncpy_s( basenm, BUFSIZ, SelectName( TYPEget_name( i ) ), BUFSIZ - 1 );
             fprintf( classes, "typedef %s %s;\n", basenm, nm );
             fprintf( classes, "typedef %s * %s_ptr;\n", nm, nm );
             fprintf( classes, "typedef %s_agg %s_agg;\n", basenm, nm );
@@ -651,7 +652,7 @@ static void addAggrTypedefs( Schema schema, FILE * classes )
                 fprintf( classes, "mas) which depend on other types:\n" );
                 firsttime = FALSE;
             }
-            strncpy( nm, ClassName( TYPEget_name( t ) ), BUFSIZ );
+            scl_strncpy_s( nm, BUFSIZ, ClassName( TYPEget_name( t ) ), BUFSIZ );
             fprintf( classes, "typedef %s        %s;\n",
                      TYPEget_ctype( t ), nm );
             fprintf( classes, "typedef %s *        %sH;\n", nm, nm );
@@ -701,7 +702,7 @@ static void addUseRefNames( Schema schema, FILE * create )
                              SCOPEget_name( ( ( Entity )rnm->object )->superscope ),
                              ENT_PREFIX, ENTITYget_name( ( Entity )rnm->object ) );
                 }
-                strcpy( schNm, PrettyTmpName( SCHEMAget_name( schema ) ) );
+                scl_strcpy_s( schNm, BUFSIZ, PrettyTmpName( SCHEMAget_name( schema ) ) );
                 fprintf( create, "->addAltName( \"%s\", \"%s\" );\n",
                          schNm, PrettyTmpName( rnm->nnew->name ) );
             }
@@ -724,7 +725,7 @@ static void addUseRefNames( Schema schema, FILE * create )
                              SCOPEget_name( ( ( Entity )rnm->object )->superscope ),
                              ENT_PREFIX, ENTITYget_name( ( Entity )rnm->object ) );
                 }
-                strcpy( schNm, PrettyTmpName( SCHEMAget_name( schema ) ) );
+                scl_strcpy_s( schNm, BUFSIZ, PrettyTmpName( SCHEMAget_name( schema ) ) );
                 fprintf( create, "->addAltName( \"%s\", \"%s\" );\n",
                          schNm, PrettyTmpName( rnm->nnew->name ) );
             }

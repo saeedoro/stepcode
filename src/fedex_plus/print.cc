@@ -9,9 +9,10 @@
 
 #include "complexSupport.h"
 #include <scl_memmgr.h>
+#include <scl_cstring.h>
 
 // Local function prototypes:
-static char * joinText( JoinType, char * );
+static char * joinText( JoinType, char *, size_t );
 
 ostream & operator << ( ostream & os, ComplexList & clist )
 /*
@@ -59,7 +60,7 @@ ostream & operator << ( ostream & os, MultList & mlist )
     // line at the end.  If not, the children of last child did already.
     EntList * child = mlist.childList;
 
-    os << joinText( mlist.join, jointype ) << endl;
+    os << joinText( mlist.join, jointype, 7 ) << endl;
     for( k = 0; k <= mlist.level; k++ ) {
         // Indent 1 more than our level (hence the "<=" ):
         os << "    ";
@@ -91,23 +92,23 @@ ostream & operator << ( ostream & os, MultList & mlist )
     return os;
 }
 
-static char * joinText( JoinType j, char * buf )
+static char * joinText( JoinType j, char * buf, size_t buf_size )
 /*
  * Copies and returns the string equivalent of a JoinType.
  */
 {
     switch( j ) {
         case SIMPLE:
-            strcpy( buf, "SIMPLE" );
+            scl_strcpy_s( buf, buf_size, "SIMPLE" );
             return buf;
         case AND:
-            strcpy( buf, "AND" );
+            scl_strcpy_s( buf, buf_size, "AND" );
             return buf;
         case OR:
-            strcpy( buf, "OR" );
+            scl_strcpy_s( buf, buf_size, "OR" );
             return buf;
         case ANDOR:
-            strcpy( buf, "ANDOR" );
+            scl_strcpy_s( buf, buf_size, "ANDOR" );
             return buf;
     };
     return NULL;
