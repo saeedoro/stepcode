@@ -23,6 +23,8 @@
 #include <varargs.h>
 #endif
 
+#include <scl_cstring.h>
+
 bool exppp_output_filename_reset;    /* if true, force output filename */
 /* DAR - moved this from .h file - not sure why was there. */
 
@@ -41,7 +43,7 @@ void ENTITY_out( Entity e, int level );
 void ENTITYinverse_out( Linked_List attrs, int level );
 void ENTITYunique_out( Linked_List u, int level );
 void EXPRop__out( struct Op_Subexpression * oe, int paren, int previous_op );
-void EXPRop_string( char * buffer, struct Op_Subexpression * oe );
+void EXPRop_string( char * buffer, size_t buffer_size, struct Op_Subexpression * oe );
 void EXPRop1_out( struct Op_Subexpression * eo, char * opcode, int paren );
 void EXPRop2__out( struct Op_Subexpression * eo, char * opcode, int paren, int pad, int previous_op );
 void EXPR__out( Expression expr, int paren, int previous_op );
@@ -79,7 +81,8 @@ int curpos;     /* current line position (1 is first position) */
 
 char * exppp_output_filename = ( char * )0; /* if this is set, override */
 /* default output filename */
-char filename[1000];    /* output file name */
+#define FILENAME_BUFSIZ     1000
+char filename[FILENAME_BUFSIZ];    /* output file name */
 Symbol error_sym;   /* only used when printing errors */
 
 char * expheader[] = {
@@ -179,7 +182,7 @@ va_dcl {
     fmt = va_arg( args, char * );
 #endif
 
-    vsprintf( buf, fmt, args );
+    scl_vsprintf_s( buf, 10000, fmt, args );
     len = strlen( buf );
 
     /* 1st condition checks if string cant fit into current line */
@@ -190,7 +193,7 @@ va_dcl {
     ( ( indent2 + len ) < exppp_linelength ) ) {
         /* move to new continuation line */
         char line[1000];
-        sprintf( line, "\n%*s", indent2, "" );
+        scl_sprintf_s( line, 1000, "\n%*s", indent2, "" );
         exp_output( line, 1 + indent2 );
 
         curpos = indent2;       /* reset current position */
@@ -227,7 +230,7 @@ va_dcl {
     fmt = va_arg( args, char * );
 #endif
 
-    vsprintf( buf, fmt, args );
+    scl_vsprintf_s( buf, 10000, fmt, args );
     len = strlen( buf );
 
     exp_output( buf, len );
@@ -328,7 +331,7 @@ SCHEMAout( Schema s ) {
     }
 
     if( exppp_output_filename ) {
-        strcpy( filename, exppp_output_filename );
+        scl_strcpy_s( filename, FILENAME_BUFSIZ, exppp_output_filename );
     } else {
         /* when there is only a single file, allow user to find */
         /* out what it is */
@@ -338,7 +341,7 @@ SCHEMAout( Schema s ) {
         /* since we have to generate a filename, make sure we don't */
         /* overwrite a valuable file */
 
-        sprintf( filename, "%s.exp", s->symbol.name );
+        scl_sprintf_s( filename, FILENAME_BUFSIZ, "%s.exp", s->symbol.name );
 
         if( 0 != ( f = fopen( filename, "r" ) ) ) {
             fgets( buf, BUFSIZE, f );
@@ -351,7 +354,7 @@ SCHEMAout( Schema s ) {
                 fprintf( stderr, "%s: %s already exists and appears to be hand-written\n",
                          EXPRESSprogram_name, filename );
                 /*          strcat(bp,".pp");*/
-                strcat( filename, ".pp" );
+                scl_strcat_s( filename, FILENAME_BUFSIZ, ".pp" );
                 fprintf( stderr, "%s: writing schema file %s instead\n",
                          EXPRESSprogram_name, filename );
                 described = true;
@@ -1840,128 +1843,128 @@ EXPRop_length( struct Op_Subexpression * oe ) {
 /* any kind of expression */
 /* contains fragment of string, adds to it */
 void
-EXPRstring( char * buffer, Expression e ) {
+EXPRstring( char * buffer, size_t buffer_size, Expression e ) {
     int i;
 
     switch( TYPEis( e->type ) ) {
         case integer_:
             if( e == LITERAL_INFINITY ) {
-                strcpy( buffer, "?" );
+                scl_strcpy_s( buffer, buffer_size, "?" );
             } else {
-                sprintf( buffer, "%d", e->u.integer );
+                scl_sprintf_s( buffer, buffer_size, "%d", e->u.integer );
             }
             break;
         case real_:
             if( e == LITERAL_PI ) {
-                strcpy( buffer, "PI" );
+                scl_strcpy_s( buffer, buffer_size, "PI" );
             } else if( e == LITERAL_E ) {
-                strcpy( buffer, "E" );
+                scl_strcpy_s( buffer, buffer_size, "E" );
             } else {
-                sprintf( buffer, "%g", e->u.real );
+                scl_sprintf_s( buffer, buffer_size, "%g", e->u.real );
             }
             break;
         case binary_:
-            sprintf( buffer, "%%%s", e->u.binary ); /* put "%" back */
+            scl_sprintf_s( buffer, buffer_size, "%%%s", e->u.binary ); /* put "%" back */
             break;
         case logical_:
         case boolean_:
             switch( e->u.logical ) {
                 case Ltrue:
-                    strcpy( buffer, "TRUE" );
+                    scl_strcpy_s( buffer, buffer_size, "TRUE" );
                     break;
                 case Lfalse:
-                    strcpy( buffer, "FALSE" );
+                    scl_strcpy_s( buffer, buffer_size, "FALSE" );
                     break;
                 default:
-                    strcpy( buffer, "UNKNOWN" );
+                    scl_strcpy_s( buffer, buffer_size, "UNKNOWN" );
                     break;
             }
             break;
         case string_:
             if( TYPEis_encoded( e->type ) ) {
-                sprintf( buffer, "\"%s\"", e->symbol.name );
+                scl_sprintf_s( buffer, buffer_size, "\"%s\"", e->symbol.name );
             } else {
-                sprintf( buffer, "'%s'", e->symbol.name );
+                scl_sprintf_s( buffer, buffer_size, "'%s'", e->symbol.name );
             }
             break;
         case entity_:
         case identifier_:
         case attribute_:
         case enumeration_:
-            strcpy( buffer, e->symbol.name );
+            scl_strcpy_s( buffer, buffer_size, e->symbol.name );
             break;
         case query_:
-            sprintf( buffer, "QUERY ( %s <* ", e->u.query->local->name->symbol.name );
-            EXPRstring( buffer + strlen( buffer ), e->u.query->aggregate );
-            strcat( buffer, " | " );
-            EXPRstring( buffer + strlen( buffer ), e->u.query->expression );
-            strcat( buffer, " )" );
+            scl_sprintf_s( buffer, buffer_size, "QUERY ( %s <* ", e->u.query->local->name->symbol.name );
+            EXPRstring( buffer + strlen( buffer ), buffer_size - strlen( buffer ), e->u.query->aggregate );
+            scl_strcat_s( buffer, buffer_size, " | " );
+            EXPRstring( buffer + strlen( buffer ), buffer_size - strlen( buffer ),  e->u.query->expression );
+            scl_strcat_s( buffer, buffer_size, " )" );
             break;
         case self_:
-            strcpy( buffer, "SELF" );
+            scl_strcpy_s( buffer, buffer_size, "SELF" );
             break;
         case funcall_:
-            sprintf( buffer, "%s(", e->symbol.name );
+            scl_sprintf_s( buffer, buffer_size, "%s(", e->symbol.name );
             i = 0;
             LISTdo( e->u.funcall.list, arg, Expression )
             i++;
             if( i != 1 ) {
-                strcat( buffer, "," );
+                scl_strcat_s( buffer, buffer_size, "," );
             }
-            EXPRstring( buffer + strlen( buffer ), arg );
+            EXPRstring( buffer + strlen( buffer ), buffer_size - strlen( buffer ), arg );
             LISTod
-            strcat( buffer, ")" );
+            scl_strcat_s( buffer, buffer_size, ")" );
             break;
 
         case op_:
-            EXPRop_string( buffer, &e->e );
+            EXPRop_string( buffer, buffer_size, &e->e );
             break;
         case aggregate_:
-            strcpy( buffer, "[" );
+            scl_strcpy_s( buffer, buffer_size, "[" );
             i = 0;
             LISTdo( e->u.list, arg, Expression )
             i++;
             if( i != 1 ) {
-                strcat( buffer, "," );
+                scl_strcat_s( buffer, buffer_size, "," );
             }
-            EXPRstring( buffer + strlen( buffer ), arg );
+            EXPRstring( buffer + strlen( buffer ), buffer_size - strlen( buffer), arg );
             LISTod
-            strcat( buffer, "]" );
+            scl_strcat_s( buffer, buffer_size, "]" );
             break;
         case oneof_:
-            strcpy( buffer, "ONEOF (" );
+            scl_strcpy_s( buffer, buffer_size, "ONEOF (" );
 
             i = 0;
             LISTdo( e->u.list, arg, Expression )
             i++;
             if( i != 1 ) {
-                strcat( buffer, "," );
+                scl_strcat_s( buffer, buffer_size, "," );
             }
-            EXPRstring( buffer + strlen( buffer ), arg );
+            EXPRstring( buffer + strlen( buffer ), buffer_size - strlen( buffer ), arg );
             LISTod
 
-            strcat( buffer, ")" );
+            scl_strcat_s( buffer, buffer_size, ")" );
             break;
         default:
-            sprintf( buffer, "EXPRstring: unknown expression, type %d", TYPEis( e->type ) );
+            scl_sprintf_s( buffer, buffer_size, "EXPRstring: unknown expression, type %d", TYPEis( e->type ) );
             fprintf( stderr, "%s", buffer );
     }
 }
 
 void
-EXPRop_string( char * buffer, struct Op_Subexpression * oe ) {
-    EXPRstring( buffer, oe->op1 );
+EXPRop_string( char * buffer, size_t buffer_size, struct Op_Subexpression * oe ) {
+    EXPRstring( buffer, buffer_size, oe->op1 );
     switch( oe->op_code ) {
         case OP_DOT:
-            strcat( buffer, "." );
+            scl_strcat_s( buffer, buffer_size, "." );
             break;
         case OP_GROUP:
-            strcat( buffer, "\\" );
+            scl_strcat_s( buffer, buffer_size, "\\" );
             break;
         default:
-            strcat( buffer, "(* unknown op-expression *)" );
+            scl_strcat_s( buffer, buffer_size, "(* unknown op-expression *)" );
     }
-    EXPRstring( buffer + strlen( buffer ), oe->op2 );
+    EXPRstring( buffer + strlen( buffer ), buffer_size - strlen( buffer ), oe->op2 );
 }
 
 /* returns length of printable representation of expression w.o. printing it */
@@ -1970,7 +1973,7 @@ EXPRlength( Expression e ) {
     char buffer[10000];
 
     *buffer = '\0';
-    EXPRstring( buffer, e );
+    EXPRstring( buffer, 10000, e );
     return( strlen( buffer ) );
 }
 
