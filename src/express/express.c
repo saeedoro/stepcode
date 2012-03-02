@@ -85,6 +85,8 @@
 #include "stack.h"
 #include "express/scope.h"
 
+#include <scl_cstring.h>
+
 extern FILE * yyin;
 extern Express yyexpresult;
 
@@ -208,10 +210,10 @@ static void EXPRESS_PATHinit() {
             /* if slash present at end, don't add another */
             slash = strrchr( start, '/' );
             if( slash && ( slash[1] == '\0' ) ) {
-                strcpy( dir->full, start );
+                scl_strcpy_s( dir->full, MAX_SCHEMA_FILENAME_SIZE, start );
                 dir->leaf = dir->full + length;
             } else {
-                sprintf( dir->full, "%s/", start );
+                scl_sprintf_s( dir->full, MAX_SCHEMA_FILENAME_SIZE, "%s/", start );
                 dir->leaf = dir->full + length + 1;
             }
             LISTadd( EXPRESS_path, ( Generic )dir );
@@ -362,7 +364,7 @@ void EXPRESSparse( Express model, FILE * fp, char * filename ) {
     if( !fp ) {
         /* go down path looking for file */
         LISTdo( EXPRESS_path, dir, Dir * )
-        sprintf( dir->leaf, "%s", filename );
+        scl_sprintf_s( dir->leaf, MAX_SCHEMA_FILENAME_SIZE - (dir->leaf - dir->full), "%s", filename );
         if( 0 != ( fp = fopen( dir->full, "r" ) ) ) {
             filename = dir->full;
             break;
@@ -586,7 +588,7 @@ Schema EXPRESSfind_schema( Dictionary modeldict, char * name ) {
 
     /* go down path looking for file */
     LISTdo( EXPRESS_path, dir, Dir * )
-    sprintf( dir->leaf, "%s.exp", lower );
+    scl_sprintf_s( dir->leaf, MAX_SCHEMA_FILENAME_SIZE - (dir->leaf - dir->full), "%s.exp", lower );
     if( print_objects_while_running & OBJ_SCHEMA_BITS ) {
         fprintf( stdout, "pass %d: %s (schema file?)\n",
                  EXPRESSpass, dir->full );

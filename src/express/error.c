@@ -71,6 +71,7 @@
 #endif
 
 #include "express/express.h"
+#include <scl_cstring.h>
 
 #define ERROR_MAX_ERRORS    100 /**< max line-numbered errors */
 #define ERROR_MAX_SPACE     4000 /**< max space for line-numbered errors */
@@ -291,7 +292,7 @@ va_dcl {
     sym.filename = current_filename;
     sym.line = line;
 
-    vsprintf( buf, what->message, args );
+    scl_vsprintf_s( buf, BUFSIZ, what->message, args );
 
     /* gross, but there isn't any way to do this more directly */
     /* without writing yet another variant of ERRORreport_with_line */
@@ -347,17 +348,17 @@ va_dcl {
             heap[child].msg = ERROR_string;
 
             if( what->severity >= SEVERITY_ERROR ) {
-                sprintf( ERROR_string, "%s:%d: --ERROR: ", sym->filename, sym->line );
+                scl_sprintf_s( ERROR_string, ERROR_MAX_SPACE - (ERROR_string - ERROR_string_base), "%s:%d: --ERROR: ", sym->filename, sym->line );
                 ERROR_string += strlen( ERROR_string );
-                vsprintf( ERROR_string, what->message, args );
+                scl_vsprintf_s( ERROR_string, ERROR_MAX_SPACE - (ERROR_string - ERROR_string_base), what->message, args );
                 ERROR_string += strlen( ERROR_string );
                 *ERROR_string++ = '\n';
                 *ERROR_string++ = '\0';
                 ERRORoccurred = true;
             } else if( what->severity >= SEVERITY_WARNING ) {
-                sprintf( ERROR_string, "%s:%d: WARNING: ", sym->filename, sym->line );
+                scl_sprintf_s( ERROR_string, ERROR_MAX_SPACE - (ERROR_string - ERROR_string_base), "%s:%d: WARNING: ", sym->filename, sym->line );
                 ERROR_string += strlen( ERROR_string );
-                vsprintf( ERROR_string, what->message, args );
+                scl_vsprintf_s( ERROR_string, ERROR_MAX_SPACE - (ERROR_string - ERROR_string_base), what->message, args );
                 ERROR_string += strlen( ERROR_string );
                 *ERROR_string++ = '\n';
                 *ERROR_string++ = '\0';

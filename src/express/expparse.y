@@ -90,6 +90,7 @@
 #include "express/schema.h"
 #include "express/entity.h"
 #include "express/resolve.h"
+#include <scl_cstring.h>
 
 #ifdef YYDEBUG
 int yydbg_upper_limit = -1;
@@ -2017,13 +2018,13 @@ char* string;
     char buf[200];
     Symbol sym;
 
-    strcpy (buf, string);
+    scl_strcpy_s(buf, 200, string);
 
-    if (yyeof) strcat(buf, " at end of input");
-    else if (yytext[0] == 0) strcat(buf, " at null character");
+    if (yyeof) scl_strcat_s(buf, 200, " at end of input");
+    else if (yytext[0] == 0) scl_strcat_s(buf, 200, " at null character");
     else if (yytext[0] < 040 || yytext[0] >= 0177)
-        sprintf(buf + strlen(buf), " before character 0%o", yytext[0]);
-    else    sprintf(buf + strlen(buf), " before `%s'", yytext);
+        scl_sprintf_s(buf + strlen(buf), 200 - strlen(buf), " before character 0%o", yytext[0]);
+    else    scl_sprintf_s(buf + strlen(buf), 200 - strlen(buf), " before `%s'", yytext);
 
     sym.line = yylineno;
     sym.filename = current_filename;

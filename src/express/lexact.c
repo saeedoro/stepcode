@@ -66,6 +66,8 @@
 #include "express/dict.h"
 #include "express/memory.h"
 
+#include <scl_cstring.h>
+
 extern int      yylineno;
 extern FILE    *    yyin;
 
@@ -415,7 +417,7 @@ SCANprocess_encoded_string( void ) {
 int
 SCANprocess_semicolon( int commentp ) {
     if( commentp ) {
-        strcpy( last_comment_, strchr( yytext, '-' ) );
+        scl_strcpy_s( last_comment_, 256, strchr( yytext, '-' ) );
         yylval.string = last_comment_;
     } else {
         yylval.string = last_comment;
@@ -430,7 +432,7 @@ SCANprocess_semicolon( int commentp ) {
 
 void
 SCANsave_comment( void ) {
-    strncpy( last_comment_ , yytext, 255 );
+    scl_strncpy_s( last_comment_ , 256, yytext, 255 );
     last_comment = last_comment_;
 }
 
@@ -540,7 +542,7 @@ SCANstrdup( char * s ) {
         return 0;
     }
 
-    strcpy( s2, s );
+    scl_strcpy_s( s2, strlen( s ) + 1, s );
     return s2;
 }
 
