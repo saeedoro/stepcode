@@ -2,6 +2,7 @@
 #define SCL_CSTRING_H
 
 #include <scl_export.h>
+#include <stdarg.h>
 
 #ifdef __cplusplus
 #include <cstddef>

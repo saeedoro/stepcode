@@ -164,6 +164,7 @@ int scl_sprintf_s( char *dest, size_t dest_size, const char * format, ... ) {
     va_list args;
     va_start( args, format );
     return scl_vsprintf_s(dest, dest_size, format, args);
+    va_end( args );
 }
 
 /**
@@ -176,7 +177,7 @@ int scl_vsprintf_s( char *dest, size_t dest_size, const char * format, va_list a
     
     count = vsnprintf(dest, dest_size, format, args);
 
-    if (count == dest_size) {
+    if ( (size_t) count == dest_size ) {
         // TODO: throw exception in stead of exit(1)?
         std::cerr << "SCL internal error (scl_scl_vsprintf_s): dest buffer too small." << std::endl;
         exit(1);
