@@ -19,7 +19,7 @@ add_definitions( -DSCL_EXPRESS_DLL_IMPORTS )
 add_definitions( -DSCL_BASE_DLL_IMPORTS )
 endif()
 
-if(BORLAND)
+if(MSVC OR BORLAND)
 add_definitions( -D__STDC__ )
 endif()
 

@@ -79,7 +79,7 @@ if(MSVC OR BORLAND)
 add_definitions( -DYY_NO_UNISTD_H )
 endif()
 
-if(BORLAND)
+if(MSVC OR BORLAND)
 add_definitions( -D__STDC__ )
 add_definitions( -DSCL_BASE_DLL_IMPORTS )
 endif()
