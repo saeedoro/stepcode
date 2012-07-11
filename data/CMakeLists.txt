@@ -60,7 +60,10 @@ FUNCTION(BUILD_A_SCHEMA SCHEMA_FILE)
                         WORKING_DIRECTORY ${SCHEMA_OUTPUT_DIR}
                         COMMENT "Running fedex_plus for ${SCHEMA_SHORT_NAME}..."
                         VERBATIM )
-    add_custom_command( OUTPUT ${SCHEMA_SHORT_NAME}_cmakelists_in COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.in ${SCHEMA_OUTPUT_DIR}/CMakeLists.txt )
+    add_custom_command( OUTPUT ${SCHEMA_SHORT_NAME}_cmakelists_in
+                        COMMAND ${CMAKE_COMMAND} ARGS -E copy
+                                    ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.in
+                                    ${SCHEMA_OUTPUT_DIR}/CMakeLists.txt )
     #building this target triggers execution of the above commands
     add_custom_target( generate_cpp_${PROJECT_NAME} ${BUILD_IN_TARGET_ALL}
                        DEPENDS ${SCHEMA_OUTPUT_DIR}/CMakeLists.txt version_string )
@@ -68,8 +71,9 @@ FUNCTION(BUILD_A_SCHEMA SCHEMA_FILE)
     #this passes several variables to the subproject; other vars can be found in the cache.
     add_custom_command( OUTPUT ${PROJECT_NAME}_CONFIGURED
                         COMMAND ${CMAKE_COMMAND} ARGS ${SCHEMA_OUTPUT_DIR}
-                                                      -DSDAI_LIB=${PROJECT_NAME} -DSDAI_LONG=${SCHEMA_LONG_NAME} -DSCL_CMAKE_DIR=${SCL_CMAKE_DIR}
-                                                      -DBUILD_ROOT=${CMAKE_BINARY_DIR} -DSC_SDAI_EXES_SRC=${SC_SDAI_EXES_SRC}
+                                    -DSDAI_LIB=${PROJECT_NAME} -DSDAI_LONG=${SCHEMA_LONG_NAME} -DSCL_CMAKE_DIR=${SCL_CMAKE_DIR}
+                                    -DBUILD_ROOT=${CMAKE_BINARY_DIR} -DSC_SDAI_EXES_SRC=${SC_SDAI_EXES_SRC}
+                                    -G ${CMAKE_GENERATOR}
                         WORKING_DIRECTORY ${SCHEMA_OUTPUT_DIR}
                         COMMENT "Configuring subproject for ${SCHEMA_SHORT_NAME}..."
                         VERBATIM )

@@ -18,20 +18,11 @@ include_directories( ${BUILD_ROOT}/include ${SCL_SOURCE_DIR}/include ${CMAKE_CUR
                      ${SCL_SOURCE_DIR}/src/cldai ${SCL_SOURCE_DIR}/src/cleditor ${SCL_SOURCE_DIR}/src/clutils
                      ${SCL_SOURCE_DIR}/src/clstepcore ${SCL_SOURCE_DIR}/src/base )
 
-#set full path to each of the libs we link with. necessary because this is a separate project, so the info about each target is lost.
-set(libs stepdai stepcore express stepeditor steputils base )
-if( APPLE )
-    foreach( lib ${libs} )
-        list( APPEND LINK_LIBS "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/lib${lib}.dylib" )
-    endforeach()
-elseif(WIN32) #windows
-    foreach( lib ${libs} )
-        list( APPEND LINK_LIBS "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/${lib}.lib" )
-    endforeach()
-else() #linux
-    foreach( lib ${libs} )
-        list( APPEND LINK_LIBS "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/lib${lib}.so" )
-    endforeach()
+set(LINK_LIBS stepdai stepcore express stepeditor steputils base )
+if(WIN32) #windows
+    link_directories(${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
+else() #linux or OSX
+    link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 endif()
 
 #copied from the main CMakeLists.txt
