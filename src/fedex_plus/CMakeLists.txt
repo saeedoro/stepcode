@@ -19,9 +19,9 @@ set(fedex_plus_SOURCES
     expressbuild.cc
     non-ors.cc
     match-ors.cc
-    trynext.cc
+    ../clstepcore/trynext.cc
     write.cc
-    print.cc
+    ../clstepcore/print.cc
 )
 
 include_directories(
@@ -29,6 +29,7 @@ include_directories(
     ${SC_SOURCE_DIR}/include/exppp
     ${SC_SOURCE_DIR}/include/express
     ${SC_SOURCE_DIR}/src/base
+    ${SC_SOURCE_DIR}/src/clutils
 )
 
 SC_ADDEXEC(fedex_plus "${fedex_plus_SOURCES}" "libexppp;express;base")

@@ -29,6 +29,6 @@
 #include <SdaiEXAMPLE_SCHEMA.h>
 #endif
 
-#include <needFunc.h>
+#include <../clstepcore/needFunc.h>
 
 extern void SchemaInit( Registry & );

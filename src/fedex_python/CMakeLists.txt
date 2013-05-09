@@ -5,6 +5,7 @@ include_directories(
     ${SC_SOURCE_DIR}/include/exppp
     ${SC_SOURCE_DIR}/include/express
     ${SC_SOURCE_DIR}/src/base
+    ${SC_SOURCE_DIR}/src/clutils
     ${SC_SOURCE_DIR}/src/fedex_plus
 )
 
@@ -27,9 +28,9 @@ set(fedex_python_SOURCES
     ../fedex_plus/expressbuild.cc 
     ../fedex_plus/non-ors.cc 
     ../fedex_plus/match-ors.cc 
-    ../fedex_plus/trynext.cc 
+    ../clstepcore/trynext.cc 
     ../fedex_plus/write.cc 
-    ../fedex_plus/print.cc
+    ../clstepcore/print.cc
 )
 SC_ADDEXEC(fedex_python "${fedex_python_SOURCES}" "libexppp;express;base")
 
