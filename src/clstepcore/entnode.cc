@@ -32,7 +32,7 @@ EntNode::EntNode( const char ** names ) {
 
     while( names[j] && *names[j] != '*' ) {
         nm = names[j];
-        while( prev != NULL && ( comp = StrCmpIns( prev->name, nm ) ) < 0 ) {
+        while( prev != NULL && ( comp = strcmp( prev->name, nm ) ) < 0 ) {
             prev2 = prev;
             prev = prev->next;
         }
@@ -43,6 +43,10 @@ EntNode::EntNode( const char ** names ) {
             // prev.  prev or prev2 may = NULL if newnode belongs at the end of
             // the list or before the beginning, respectively.
             newnode = new EntNode( nm );
+            // Same kludge:
+            if( *nm == 'c' || *nm == 'm' || *nm == 'j' ) {
+                newnode->multSuprs( true );
+            }
             newnode->next = prev;
             if( prev2 == NULL ) {
                 // This will be the case if the inner while was never entered.
