@@ -27,7 +27,7 @@ set(fedex_python_SOURCES
     ../fedex_plus/entnode.cc 
     ../fedex_plus/expressbuild.cc 
     ../fedex_plus/non-ors.cc 
-    ../fedex_plus/match-ors.cc 
+    ../clstepcore/match-ors.cc 
     ../clstepcore/trynext.cc 
     ../fedex_plus/write.cc 
     ../clstepcore/print.cc

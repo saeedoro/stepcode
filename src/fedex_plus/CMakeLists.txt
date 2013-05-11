@@ -18,7 +18,7 @@ set(fedex_plus_SOURCES
     entnode.cc
     expressbuild.cc
     non-ors.cc
-    match-ors.cc
+    ../clstepcore/match-ors.cc
     ../clstepcore/trynext.cc
     write.cc
     ../clstepcore/print.cc
