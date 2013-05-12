@@ -157,6 +157,9 @@ class SC_CORE_EXPORT EntList {
         virtual void setLevel( int l ) {
             level = l;
         }
+        virtual int getMaxLevel() {
+            return level;
+        }
         virtual bool contains( const char * ) = 0;
         virtual bool hit( const char * ) = 0;
 		
@@ -261,6 +264,7 @@ class SC_CORE_EXPORT MultList : public EntList {
             childList( 0 ) {}
         ~MultList();
         void setLevel( int );
+        int getMaxLevel();
         bool contains( const char * );
         bool hit( const char * );
         int isDependent( const char * );

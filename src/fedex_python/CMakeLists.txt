@@ -22,7 +22,7 @@ set(fedex_python_SOURCES
     ../clstepcore/collect.cc 
     ../fedex_plus/complexlist.cc 
     ../fedex_plus/entlist.cc 
-    ../fedex_plus/multlist.cc 
+    ../clstepcore/multlist.cc 
     ../clstepcore/orlist.cc 
     ../clstepcore/entnode.cc 
     ../fedex_plus/expressbuild.cc 

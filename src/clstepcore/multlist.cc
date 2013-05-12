@@ -42,6 +42,23 @@ void MultList::setLevel( int l ) {
     }
 }
 
+/* Used in fedex_plus */
+int MultList::getMaxLevel() {
+    EntList * child = childList;
+    int maxLevel, childLevel;
+
+    maxLevel = level;
+    while( child ) {
+        childLevel = child->getMaxLevel();
+        if( childLevel > maxLevel ) {
+            maxLevel = childLevel;
+        }
+        child = child->next;
+    }
+
+    return maxLevel;
+}
+
 /**
  * Check if one of this's descendants matches nm.
  */
@@ -62,6 +79,7 @@ bool MultList::contains( const char * nm ) {
  */
 bool MultList::hit( const char * nm ) {
     EntList * child = childList;
+
     while( child ) {
         if( child->viable > UNSATISFIED && child->hit( nm ) ) {
             // For most child->join types ruling out UNSATs just saves us
@@ -216,6 +234,8 @@ EntList * MultList::copyList( EntList * ent ) {
             break;
         case AND:
             newlist = new AndList;
+/* Next line is imported from the copy in fedex_plus */
+            ( ( AndList * )newlist )->supertype = ( ( AndList * )ent )->supertype;
             break;
         case OR:
             newlist = new OrList;
