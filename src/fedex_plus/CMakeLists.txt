@@ -10,7 +10,7 @@ set(fedex_plus_SOURCES
     classes.c
     selects.c
     multpass.c
-    collect.cc
+    ../clstepcore/collect.cc
     complexlist.cc
     entlist.cc
     multlist.cc

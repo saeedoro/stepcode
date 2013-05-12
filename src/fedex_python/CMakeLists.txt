@@ -19,7 +19,7 @@ set(fedex_python_SOURCES
     src/classes_python.c 
     src/selects_python.c 
     src/multpass_python.c 
-    ../fedex_plus/collect.cc 
+    ../clstepcore/collect.cc 
     ../fedex_plus/complexlist.cc 
     ../fedex_plus/entlist.cc 
     ../fedex_plus/multlist.cc 
