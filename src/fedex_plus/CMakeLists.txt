@@ -14,7 +14,7 @@ set(fedex_plus_SOURCES
     complexlist.cc
     entlist.cc
     multlist.cc
-    orlist.cc
+    ../clstepcore/orlist.cc
     ../clstepcore/entnode.cc
     expressbuild.cc
     ../clstepcore/non-ors.cc
