@@ -12,7 +12,7 @@ set(fedex_plus_SOURCES
     multpass.c
     ../clstepcore/collect.cc
     complexlist.cc
-    entlist.cc
+    ../clstepcore/entlist.cc
     ../clstepcore/multlist.cc
     ../clstepcore/orlist.cc
     ../clstepcore/entnode.cc

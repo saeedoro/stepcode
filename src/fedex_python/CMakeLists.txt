@@ -21,7 +21,7 @@ set(fedex_python_SOURCES
     src/multpass_python.c 
     ../clstepcore/collect.cc 
     ../fedex_plus/complexlist.cc 
-    ../fedex_plus/entlist.cc 
+    ../clstepcore/entlist.cc 
     ../clstepcore/multlist.cc 
     ../clstepcore/orlist.cc 
     ../clstepcore/entnode.cc 
