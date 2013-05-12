@@ -20,7 +20,8 @@
 using namespace std;
 #include "Str.h"
 
-#define LISTEND 999
+#define DONT_KNOW -1
+#define LISTEND  999
 /** \def LISTEND
  * signifies that an OrList has gone beyond its last viable choice
  * among its children. FIXME is 999 high enough? Maybe use -1?
@@ -156,8 +157,11 @@ class SC_CORE_EXPORT EntList {
         virtual void setLevel( int l ) {
             level = l;
         }
-        virtual bool contains( char * ) = 0;
-        virtual bool hit( char * ) = 0;
+        virtual bool contains( const char * ) = 0;
+        virtual bool hit( const char * ) = 0;
+		
+		/* Used in src/fedex_plus */
+		virtual int isDependent( const char * ) = 0;
         virtual MatchType matchNonORs( EntNode * ) {
             return UNKNOWN;
         }
@@ -222,12 +226,13 @@ class SC_CORE_EXPORT SimpleList : public EntList {
         const char * Name() {
             return name;
         }
-        bool contains( char * nm ) {
+        bool contains( const char * nm ) {
             return *this == nm;
         }
-        bool hit( char * nm ) {
+        bool hit( const char * nm ) {
             return *this == nm;
         }
+        int isDependent( const char * );
         MatchType matchNonORs( EntNode * );
         bool acceptChoice( EntNode * );
         void unmarkAll( EntNode * );
@@ -256,8 +261,9 @@ class SC_CORE_EXPORT MultList : public EntList {
             childList( 0 ) {}
         ~MultList();
         void setLevel( int );
-        bool contains( char * );
-        bool hit( char * );
+        bool contains( const char * );
+        bool hit( const char * );
+        int isDependent( const char * );
         void appendList( EntList * );
         EntList * copyList( EntList * );
         virtual MatchType matchORs( EntNode * ) = 0;
@@ -316,6 +322,7 @@ class SC_CORE_EXPORT AndList : public JoinList {
     public:
         AndList() : JoinList( AND ) {}
         ~AndList() {}
+        int isDependent( const char * );
         MatchType matchNonORs( EntNode * );
         MatchType matchORs( EntNode * );
 };
@@ -324,7 +331,7 @@ class SC_CORE_EXPORT OrList : public MultList {
     public:
         OrList() : MultList( OR ), choice( -1 ), choice1( -1 ), choiceCount( 0 ) {}
         ~OrList() {}
-        bool hit( char * );
+        bool hit( const char * );
         MatchType matchORs( EntNode * );
         MatchType tryNext( EntNode * );
         void unmarkAll( EntNode * );
@@ -381,6 +388,8 @@ class SC_CORE_EXPORT ComplexList {
         bool toplevel( const char * );
         bool contains( EntNode * );
         bool matches( EntNode * );
+        int isDependent( const char * );
+
 
         EntNode * list; /**< List of all entities contained in this complex type,
                     *   regardless of how.  (Used as a quick way of determining

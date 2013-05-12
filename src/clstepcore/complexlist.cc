@@ -209,6 +209,35 @@ bool ComplexList::matches( EntNode * ents ) {
     return result;
 }
 
+/* Used in src/fedex_plus */
+int ComplexList::isDependent( const char * ent )
+/*
+ * Do any of our members tell us that ent cannot be instantiated indepen-
+ * dently.  This is the case if ent = one of the subtypes beneath and the
+ * subtype is AND'ed with other entities.  For example, if A is a super of
+ * (B AND C), B can only be created together with C or as an A-B-C.  This
+ * would require B to be instantiated using external mapping, according to
+ * Part 21, sect 11.2.5.1.  If, however, A were super of "ONEOF (B, C)", B
+ * would be instantiated without C.  Although it must be created as an A-B,
+ * it could (must?) be created with internal mapping.
+ */
+{
+    EntList * elist = head->childList->next;
+    // We start searching from the first sibling after head->childList.  head->
+    // childList represents the supertype (`A' in header comments) which though
+    // it of course is AND'ed with all its subtypes, it doesn't make its sub's
+    // non-independent.
+
+    if( elist->isDependent( ent ) == true ) {
+        return true;
+    }
+    if( next ) {
+        return ( next->isDependent( ent ) );
+    }
+    return false;
+}
+
+
 /**
  * This function has a specialized application.  If the user wants to
  * instantiate a complex type containing an entity with >1 supertype (call

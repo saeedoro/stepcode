@@ -45,7 +45,7 @@ void MultList::setLevel( int l ) {
 /**
  * Check if one of this's descendants matches nm.
  */
-bool MultList::contains( char * nm ) {
+bool MultList::contains( const char * nm ) {
     EntList * child = childList;
 
     while( child ) {
@@ -60,7 +60,7 @@ bool MultList::contains( char * nm ) {
 /**
  * Check if one of our descendants matches nm.
  */
-bool MultList::hit( char * nm ) {
+bool MultList::hit( const char * nm ) {
     EntList * child = childList;
     while( child ) {
         if( child->viable > UNSATISFIED && child->hit( nm ) ) {
@@ -75,6 +75,99 @@ bool MultList::hit( char * nm ) {
     }
     return false;
 }
+
+/* Used in fedex_plus */
+/*
+ * Can one of our descendants tell us that entity ent can or cannot be
+ * instantiated independently (i.e., not as a complex entity with external
+ * mapping).  This is primarily the case if ent is AND'ed with 1+ other
+ * entities (e.g., if A is super of B AND C, B can only be created together
+ * with C).  This is the version of isDependent for OR and ANDOR.  It is
+ * redefined for AND.  Detailed commenting may be found in AndList::is-
+ * Dependent().
+ */
+int MultList::isDependent( const char * ent )
+{
+    EntList * child = childList;
+    int result = DONT_KNOW, retval;
+
+    while( child ) {
+        if( ( retval = child->isDependent( ent ) ) == false ) {
+            return false;
+        }
+        if( retval == true ) {
+            // If child tells us that ent must be created together with another
+            // leaf node (e.g., child is an AndList AND'ing ent + ent_b), save
+            // the result.  Don't return TRUE yet because a later child may
+            // tell us that ent may also be instantiable on its own.  That re-
+            // sult will override this since it would mean that ent does not
+            // *have* to be created with ext mapping.
+            result = true;
+        }
+        child = child->next;
+    }
+    return result;
+    // either DONT_KNOW or TRUE if we got here
+}
+
+/* Used in src/fedex_plus */
+/*
+ * Tells us if entity ent cannot be instantiated independently.  Say ent
+ * A is a supertype of ( B AND C ).  Neither B nor C can be instantiated
+ * without the other.  An instance of A-B-C can only be created using
+ * external mapping (see Part 21, sect 11.2.5.1).  This function returns
+ * TRUE if `this' can show that ent requires external mapping.  If this
+ * can show that ent does not require ext mapping, it returns FALSE, and
+ * if nothing can be determined, it returns DONT_KNOW.
+ */
+int AndList::isDependent( const char * ent )
+{
+    if( supertype ) {
+        // If we're a supertype, we have to make one exception.  Normally if
+        // we're an AND of A & B and ent = A, we'd be able to conclude that A
+        // requires ext mapping.  But here, the first child of the AND is a
+        // supertype (super statements are represented as AND - super - subs).
+        // Since a super + sub combo such as A-B does not require ext mapping,
+        // we skip the first child.  We then continue to check if among the
+        // subtypes of A there are children requiring ext mapping (such as B
+        // AND C).
+        return ( childList->next->isDependent( ent ) );
+        // NOTE - actually the algorithm for a supertype is more complex.  We
+        // did not address here the possibility that ent = the super (A).  In
+        // such a case, if A is non-abstract, then by def it can be instanti-
+        // ated by itself (barring ANDs higher up in the ComplexList).  If A is
+        // abstract then it depends if its subtypes require ext mapping (maybe
+        // it's a super of B AND C).  The reason I don't bother is because if
+        // A is non-abstract, isDependent() would have found an "OR A" at the
+        // level above this (that's how non-abs super's are implemented -
+        //     OR +
+        //        - A - AND +
+        //                  - A - <A's subtype struct>
+        // i.e., either A alone OR A + its subs).  So at the level above,
+        // isDependent() would have realized that A is not dependent.  If A is
+        // abstract, we don't bother checking further (though it's complex, as
+        // above).  The reason is that this check is done to determine if an
+        // instance of A can be created using internal mapping ("#10=A(...)")
+        // or does ext mapping have to be used.  Here, there is no way to
+        // create an A altogether since it's abstract.
+    }
+
+    // Next possibility:  We don't represent a supertype.  Thus, if we have >1
+    // child and ent is one of them, it can only be created by being AND'ed
+    // with at least 1 other child.
+    if( numchildren > 1 ) {
+        if( contains( ent ) ) {
+            return true;
+        }
+        return DONT_KNOW;
+    }
+
+    // If we have 1 child only, just move on.  At this point, the fact that
+    // we're an AND didn't go very far in telling us that our children are
+    // dependent on one another since we only *have* one child.
+    return ( childList->isDependent( ent ) );
+}
+
 
 /**
  * Returns a pointer to the num'th child of MultList.

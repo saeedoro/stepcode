@@ -25,7 +25,7 @@
  * context of a sub w/ >1 super, in which case we build a combo-CList and
  * may need to check if all sub-CLists matched the multi-sub, C.)
  */
-bool OrList::hit( char * nm ) {
+bool OrList::hit( const char * nm ) {
     EntList * child = getChild( choice );
 
     if( child ) {

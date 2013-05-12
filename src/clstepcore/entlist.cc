@@ -80,6 +80,19 @@ EntList * EntList::lastWanted( MatchType match ) {
     return sibling;  // (may = NULL)
 }
 
+/* Used in src/fedex_plus */
+int SimpleList::isDependent( const char * ent )
+/*
+ * Can we determine that ent can be instantiated independently (a Simple-
+ * List could never tell us that an entity is dependent - only a AndList
+ * could determine that.)
+ */
+{
+    if( !strcmp( name, ent ) ) {
+        return false;
+    }
+    return DONT_KNOW;
+}
 
 /**
  * Unmarks the node that was marked by this List.  Normally called when
