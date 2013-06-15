@@ -403,7 +403,7 @@ const char * STEPattribute::asStr( std::string & str, const char * currSch ) con
     // The attribute has been derived by a subtype's attribute
     if( IsDerived() )  {
         str = "*";
-        return const_cast<char *>( str.c_str() );
+        return str.c_str();
     }
 
     // The attribute has been redefined by the attribute pointed
@@ -413,8 +413,8 @@ const char * STEPattribute::asStr( std::string & str, const char * currSch ) con
     }
 
     if( is_null() )  {
-        str = "";
-        return const_cast<char *>( str.c_str() );
+        str.clear();
+        return str.c_str();
     }
 
     switch( NonRefType() ) {
@@ -467,7 +467,7 @@ const char * STEPattribute::asStr( std::string & str, const char * currSch ) con
 
         case SELECT_TYPE:
             ptr.sh -> STEPwrite( str, currSch );
-            return const_cast<char *>( str.c_str() );
+            return str.c_str();
 
         case REFERENCE_TYPE:
         case GENERIC_TYPE:
@@ -479,7 +479,7 @@ const char * STEPattribute::asStr( std::string & str, const char * currSch ) con
         default:
             return ( ptr.u -> asStr( str ) );
     }
-    return const_cast<char *>( str.c_str() );
+    return str.c_str();
 }
 
 /**
@@ -786,7 +786,7 @@ int STEPattribute::is_null()  const {
             return ( *( ptr.c ) == S_ENTITY_NULL );
 
         case STRING_TYPE:
-            return ( *( ptr.S ) == S_STRING_NULL );
+            return ptr.S->empty();
 
         case BINARY_TYPE:
             return ptr.b->empty();
