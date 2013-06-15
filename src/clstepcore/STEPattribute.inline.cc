@@ -18,7 +18,7 @@
 
 ///  This is needed so that STEPattribute's can be passed as references to inline functions
 STEPattribute::STEPattribute( const STEPattribute & a )
-    : _derive( 0 ), _redefAttr( 0 ), aDesc( a.aDesc ), refCount( 0 ) {}
+    : _derive( a._derive ), _redefAttr( a._redefAttr ), aDesc( a.aDesc ), refCount( 0 ), ptr( a.ptr ) {}
 
 ///  INTEGER
 STEPattribute::STEPattribute( const class AttrDescriptor & d, SDAI_Integer * p )
