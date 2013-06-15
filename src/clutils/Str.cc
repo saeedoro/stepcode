@@ -68,14 +68,15 @@ const char * StrToLower( const char * word, std::string & s ) {
 const char * StrToUpper( const char * word, std::string & s ) {
     char newword [BUFSIZ];
     int i = 0;
-
-    while( word [i] != '\0' ) {
-        newword [i] = ToUpper( word [i] );
-        ++i;
+    if( word ) {
+        while( word [i] != '\0' ) {
+            newword [i] = ToUpper( word [i] );
+            ++i;
+        }
+        newword [i] = '\0';
+        s = newword;
     }
-    newword [i] = '\0';
-    s = newword;
-    return const_cast<char *>( s.c_str() );
+    return s.c_str();
 }
 
 const char * StrToConstant( const char * word, std::string & s ) {
